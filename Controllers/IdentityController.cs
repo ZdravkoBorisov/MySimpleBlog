@@ -19,7 +19,7 @@ namespace MySimpleBlog.Controllers
         }
 
         [HttpPost]
-        [Route("Login")]
+        [Route("Logout")]
         public IActionResult Logout()
         {
             return null;
