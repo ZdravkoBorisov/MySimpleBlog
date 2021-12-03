@@ -1,21 +1,19 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using MySimpleBlog.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace MySimpleBlog
 {
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.OpenApi.Models;
+    using Microsoft.AspNetCore.Identity;
+
+    using MySimpleBlog.Data;
+    using MySimpleBlog.Data.Models;
+    using MySimpleBlog.Services.Contracts;
+    using MySimpleBlog.Services.Identity;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -29,6 +27,21 @@ namespace MySimpleBlog
         {
             services.AddDbContext<ApplicationDbContext>(options => options
             .UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
+
+            services
+                .AddIdentity<ApplicationUser, ApplicationRole>(options =>
+                {
+                    options.SignIn.RequireConfirmedEmail = false;
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequiredLength = 6;
+                })
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddTransient<IIdentityService, IdentityService>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -59,6 +72,7 @@ namespace MySimpleBlog
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {

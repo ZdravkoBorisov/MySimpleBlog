@@ -9,10 +9,8 @@
 
         public bool IsDeleted { get; set; }
 
-        [AllowNull]
         public DateTime DeletedOn { get; set; }
 
-        [AllowNull]
-        public DateTime ModifiedOn { get; set; }
+        public DateTime? ModifiedOn { get; set; }
     }
 }
